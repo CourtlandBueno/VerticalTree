@@ -32,10 +32,13 @@ public protocol IndexPathNode {
 }
 
 /// Node protocol
-public protocol VerticalTreeNode: IndexPathNode where Self.T == Self {
+public protocol VerticalTreeNode: class, IndexPathNode where Self.T == Self {
     /// indexViewLegnth
     var length: TreeNodeLength { get }
     /// info description
     var info: Infomation { get }
     var isFold: Bool { set get }
+    var treeDeep: Int { get }
+    func allSubnodes(_ includeSelf: Bool) -> [T]
+    func getRootNode() -> T
 }

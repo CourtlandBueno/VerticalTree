@@ -5,6 +5,7 @@
 //  Created by Daniel Yang on 2019/4/15.
 //
 
+#if os(iOS)
 import UIKit
 
 //MARK: - helper
@@ -133,3 +134,4 @@ extension UIViewController: IndexPathNode {
         return VerticalTreeSolution.indexPath(treeBaseClass)
     }
 }
+#endif

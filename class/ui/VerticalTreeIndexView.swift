@@ -6,24 +6,26 @@
 //  Copyright © 2019 Daniel Yang. All rights reserved.
 //
 
+#if os(iOS)
 import UIKit
 
-class VerticalTreeIndexView<T: VerticalTreeNode>: UIView {
+open class VerticalTreeIndexView<T: VerticalTreeNode>: UIView {
+    weak var listController: VerticalTreeListController<T>?
+    open var labelLeading: NSLayoutConstraint?
     
-    var labelLeading: NSLayoutConstraint?
-    
-    lazy var label: UILabel = {
-        UILabel().then {
-            $0.textColor = UIColor.black
-            $0.font = UIFont.systemFont(ofSize: 12)
-            $0.translatesAutoresizingMaskIntoConstraints = false
-        }
+    open lazy var label: UILabel = {
+        let _label = UILabel()
+        _label.textColor = UIColor.darkText
+        _label.font = UIFont.preferredFont(forTextStyle: .body)
+        _label.adjustsFontForContentSizeCategory = true
+        _label.translatesAutoresizingMaskIntoConstraints = false
+        return _label
     }()
     
     var horizonLine = CALayer()
     var verticalLines = [CALayer]()
     
-    var node: T? {
+    public var node: T? {
         didSet {
             guard let node = node else { return }
             
@@ -34,7 +36,9 @@ class VerticalTreeIndexView<T: VerticalTreeNode>: UIView {
             horizonLine.backgroundColor = UIColor.treeDeep(nodeDeep, treeDeep).cgColor
             
             verticalLines.flexibleReuse(targetCount: node.currentDeep+1, map: { () -> CALayer in
-                return CALayer().then { self.layer.addSublayer($0) }
+                let layer = CALayer()
+                self.layer.addSublayer(layer)
+                return layer
             }, handle: {
                 $0.removeFromSuperlayer()
             })
@@ -44,32 +48,40 @@ class VerticalTreeIndexView<T: VerticalTreeNode>: UIView {
         }
     }
     
-    override init(frame: CGRect) {
+    override public init(frame: CGRect) {
         super.init(frame: frame)
-        _init()
+        setupContentView()
+        setupGestureRecognizers()
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        _init()
+        setupContentView()
+        setupGestureRecognizers()
     }
     
-    private func _init() {
+    open func setupContentView() {
         addSubview(label)
         layer.addSublayer(horizonLine)
         
-        labelLeading = label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 100).then { $0.isActive = true }
+        let _labelLeading = label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 100)
+        _labelLeading.isActive = true
+        labelLeading = _labelLeading
+        
         NSLayoutConstraint.activate([
             label.topAnchor.constraint(equalTo: topAnchor),
             label.bottomAnchor.constraint(equalTo: bottomAnchor),
             label.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor)
-        ])
-        
-        let longG = UILongPressGestureRecognizer(target: self, action: #selector(longPressToShowCopyMenu(_:)))
+            ])
+    }
+    
+    open func setupGestureRecognizers() {
+        let longG = UILongPressGestureRecognizer(target: self, action: #selector(longPressToShowMenu(_:)))
         addGestureRecognizer(longG)
     }
     
-    override func layoutSubviews() {
+    
+    override open func layoutSubviews() {
         super.layoutSubviews()
         guard let node = node else { return }
         
@@ -94,21 +106,29 @@ class VerticalTreeIndexView<T: VerticalTreeNode>: UIView {
         }
     }
     
-    override var canBecomeFirstResponder: Bool {
+    override open var canBecomeFirstResponder: Bool {
         return true
     }
     
-    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+    
+    override open func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        
         if action == #selector(copyText(_:)) {
             return true
         }
         return super.canPerformAction(action, withSender: sender)
     }
     
-    @objc private func longPressToShowCopyMenu(_ sender: UILongPressGestureRecognizer) {
+    
+    open var menuItems: [UIMenuItem] {
+        return [UIMenuItem(title: "Copy Node Info", action: #selector(copyText(_:)))]
+    }
+    
+    @objc private func longPressToShowMenu(_ sender: UILongPressGestureRecognizer) {
         let menu = UIMenuController.shared
         if sender.state != .began, menu.isMenuVisible { return }
-        menu.menuItems = [UIMenuItem(title: "copy", action: #selector(copyText(_:)))]
+        
+        menu.menuItems = menuItems
         menu.setTargetRect(label.bounds, in: self.label)
         menu.setMenuVisible(true, animated: true)
         becomeFirstResponder()
@@ -117,6 +137,16 @@ class VerticalTreeIndexView<T: VerticalTreeNode>: UIView {
     @objc private func copyText(_ sender: Any?) {
         UIPasteboard.general.string = node?.info.nodeDescription ?? node?.info.nodeTitle
     }
+    
+    @objc private func share(_ sender: Any?) {
+        
+        let activityVC = UIActivityViewController(activityItems: [node?.info.nodeTitle as Any, node?.info.nodeDescription as Any], applicationActivities: nil)
+        
+        listController?.present(activityVC, animated: true, completion: nil)
+        
+    }
+    
+    
 }
 
 fileprivate extension VerticalTreeIndexView {
@@ -159,3 +189,5 @@ extension UIColor {
         return UIColor.black.withAlphaComponent(0.5 + (deepest-0.5)*CGFloat(nodeDeep)/CGFloat(treeDeep))
     }
 }
+
+#endif

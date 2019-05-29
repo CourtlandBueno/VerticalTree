@@ -31,7 +31,7 @@ extension IndexPathNode {
     }
     
     public var haveChild: Bool {
-        return self.childs.count > 0
+        return !self.childs.isEmpty
     }
     
     public var haveParent: Bool {

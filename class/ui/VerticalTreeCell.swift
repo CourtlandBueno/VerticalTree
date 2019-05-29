@@ -5,37 +5,47 @@
 //  Created by Daniel Yang on 2019/4/5.
 //  Copyright © 2019 Daniel Yang. All rights reserved.
 //
-
+#if os(iOS)
 import UIKit
-import Then
 
-class VerticalTreeCell<T: VerticalTreeNode>: UITableViewCell {
-    
-    var descriptionHeightConstraint: NSLayoutConstraint?
-
-    lazy var indexView: VerticalTreeIndexView<T> = {
-        VerticalTreeIndexView<T>().then {
-            $0.translatesAutoresizingMaskIntoConstraints = false
+open class VerticalTreeCell<T: VerticalTreeNode>: UITableViewCell {
+    weak var listController: VerticalTreeListController<T>? {
+        didSet {
+            indexView.listController = listController
         }
+    }
+    open var descriptionHeightConstraint: NSLayoutConstraint?
+
+    open lazy var indexView: VerticalTreeIndexView<T> = {
+        let view = VerticalTreeIndexView<T>()
+            view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     
-    lazy var descriptionLabel: UILabel = {
-        UILabel().then {
-            $0.backgroundColor = UIColor.yellow.withAlphaComponent(0.2)
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            $0.font = UIFont.systemFont(ofSize: 10)
-            $0.textColor = UIColor.lightGray
-            $0.numberOfLines = 0
-        }
+    open lazy var foldView: UIView = {
+       let view = UIView()
+        view.backgroundColor = UIColor.lightGray.withAlphaComponent(0.2)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    open lazy var descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.adjustsFontForContentSizeCategory = true
+        label.textColor = UIColor.darkText
+        label.numberOfLines = 0
+        return label
     }()
 
-    var fold: Bool = true {
+    open var fold: Bool = true {
         didSet {
             descriptionHeightConstraint?.isActive = fold
         }
     }
     
-    var node: T? {
+    open var node: T? {
         didSet {
             indexView.node = node
             descriptionLabel.text = node?.info.nodeDescription
@@ -45,34 +55,47 @@ class VerticalTreeCell<T: VerticalTreeNode>: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        _init()
+        setupContentView()
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        _init()
+        setupContentView()
     }
     
-    func _init() {
+    open func setupContentView() {
         self.clipsToBounds = true
         
         contentView.addSubview(indexView)
-        contentView.addSubview(descriptionLabel)
+        contentView.addSubview(foldView)
+        foldView.addSubview(descriptionLabel)
+        //        contentView.addSubview(descriptionLabel)
         
-        descriptionHeightConstraint = descriptionLabel.heightAnchor.constraint(equalToConstant: 0).then {
-            $0.priority = UILayoutPriority.required
-            $0.isActive = fold
-        }
+        let _descriptionHeightConstraint = descriptionLabel.heightAnchor.constraint(equalToConstant: 0)
+        _descriptionHeightConstraint.priority = UILayoutPriority.required
+        _descriptionHeightConstraint.isActive = fold
+        descriptionHeightConstraint = _descriptionHeightConstraint
+        
+        let indexViewHeight = indexView.heightAnchor.constraint(greaterThanOrEqualToConstant: 20)
+        indexViewHeight.priority = .defaultHigh
+        indexViewHeight.isActive = true
+        
         NSLayoutConstraint.activate([
             indexView.topAnchor.constraint(equalTo: contentView.topAnchor),
             indexView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             indexView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            indexView.heightAnchor.constraint(greaterThanOrEqualToConstant: 20),
+            //            indexView.heightAnchor.constraint(greaterThanOrEqualToConstant: 20),
             
-            descriptionLabel.topAnchor.constraint(greaterThanOrEqualTo: indexView.bottomAnchor),
-            descriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            descriptionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-        ])
+            foldView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            foldView.topAnchor.constraint(greaterThanOrEqualTo: indexView.bottomAnchor),
+            foldView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            foldView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            
+            descriptionLabel.leadingAnchor.constraint(equalTo: indexView.label.leadingAnchor),
+            descriptionLabel.topAnchor.constraint(equalTo: foldView.topAnchor),
+            descriptionLabel.bottomAnchor.constraint(equalTo: foldView.bottomAnchor),
+            descriptionLabel.trailingAnchor.constraint(equalTo: foldView.trailingAnchor)
+            ])
     }
 }
+#endif

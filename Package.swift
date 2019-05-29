@@ -1,3 +1,4 @@
+// swift-tools-version:5.1
 //
 //  Package.swift
 //  Demo
@@ -6,14 +7,24 @@
 //  Copyright © 2019 Daniel Yang. All rights reserved.
 //
 
+
 import PackageDescription
 
 let package = Package(
     name: "VerticalTree",
     products: [
-        .library(name: "VerticalTree", targets: ["Demo"]),
+        .library(
+            name: "VerticalTree", 
+            targets: ["VerticalTree"]),
+    ],
+    dependencies: [
+        // Dependencies declare other packages that this package depends on.
+        // .package(url: /* package url */, from: "1.0.0"),
     ],
     targets: [
-        .target(name: "Demo"),
+        .target(
+            name: "VerticalTree"),
+            dependencies: []),
+        
     ]
 )

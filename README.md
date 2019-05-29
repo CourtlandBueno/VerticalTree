@@ -13,9 +13,6 @@
 	<a href="http://cocoapods.org/pods/VerticalTree">
 		<image alt="Platform" src="https://img.shields.io/cocoapods/p/VerticalTree.svg?style=flat">
 	</a>
-	<a href="https://travis-ci.org/ZhipingYang/VerticalTree">
-		<image alt="CI Status" src="http://img.shields.io/travis/ZhipingYang/VerticalTree.svg?style=flat">
-	</a>
 </p>
 
 > Provides a vertical drawing of the tree structure which can view information about the tree‘s nodes and supports console debug views & layers and so on

@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.0
 //
 //  Package.swift
 //  Demo
@@ -23,7 +23,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "VerticalTree"),
+            name: "VerticalTree",
             dependencies: []),
         
     ]

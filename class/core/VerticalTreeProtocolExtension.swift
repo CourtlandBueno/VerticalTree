@@ -83,9 +83,32 @@ extension VerticalTreeNode {
     public func nodePrettyText(_ moreInfoIfHave: Bool = false) -> String {
         let nodeChain = sequence(first: parent) { $0?.parent }
         let spaceStrings = nodeChain.map { ($0 != nil) ? ($0?.haveNext ?? false ? " │" : ($0?.haveParent ?? false ? "  ":"")) : "" }
-        let firstPre = (haveParent ? (haveNext ? " ├" : " └") : "") + (haveChild ? "─┬─ ":"─── ")
-        let keyText = moreInfoIfHave ? (info.nodeDescription ?? info.nodeTitle) : info.nodeTitle
-        return spaceStrings.reversed().joined() + firstPre + keyText
+        let isParent = haveChild
+        let hasSibling = haveNext
+        
+        let firstPre = (haveParent ? (hasSibling ? " ├" : " └") : "") + (isParent ? "─┬─ ":"─── ")
+        let initialPadding = spaceStrings.reversed().joined()
+        var keyText: String = info.nodeTitle
+        let keyPadding = initialPadding + firstPre
+
+        if moreInfoIfHave {
+            if let moreInfo = info.nodeDescription {
+                var splitInfo = moreInfo.split(separator: .init("\n")).map({ String($0) })
+                if !splitInfo.isEmpty {
+                    splitInfo.insert(keyText, at: 0)
+                }
+                let lastPieceOfInfo = splitInfo.popLast()
+                let nodeString = (hasSibling ? " │" : "  ") + (isParent ? " │  ": "   ")
+                var joinedInfo = splitInfo.joined(separator: "\n" + initialPadding + nodeString)
+                if let last = lastPieceOfInfo {
+                    joinedInfo += "\n" + initialPadding + nodeString + last
+                }
+                if !joinedInfo.isEmpty {
+                    keyText = joinedInfo
+                }
+            }
+        }
+        return keyPadding + keyText
     }
     
     /// as a subtree at current node

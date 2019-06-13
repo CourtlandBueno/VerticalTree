@@ -112,12 +112,12 @@ extension VerticalTreeNode {
     }
     
     /// as a subtree at current node
-    public func subTreePrettyText(moreInfoIfHave: Bool = false, highlighted: Self? = nil) -> String {
-        return VerticalTreeHeaderTitle + self.allSubnodes().map { $0.nodePrettyText(moreInfoIfHave) + "\n" }.joined()
+    public func subTreePrettyText(treeHeaderTitle: String? = nil, moreInfoIfHave: Bool = false, highlighted: Self? = nil) -> String {
+        return (treeHeaderTitle ?? VerticalTreeHeaderTitle) + self.allSubnodes().map { $0.nodePrettyText(moreInfoIfHave) + "\n" }.joined()
     }
     
     /// found rootNode then get the full tree
-    public func treePrettyText(_ moreInfoIfHave: Bool = false) -> String {
-        return getRootNode().subTreePrettyText(moreInfoIfHave: moreInfoIfHave)
+    public func treePrettyText(treeHeaderTitle: String? = nil, _ moreInfoIfHave: Bool = false) -> String {
+        return getRootNode().subTreePrettyText(treeHeaderTitle: treeHeaderTitle, moreInfoIfHave: moreInfoIfHave)
     }
 }

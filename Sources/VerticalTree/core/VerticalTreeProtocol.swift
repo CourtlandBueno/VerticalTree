@@ -32,7 +32,7 @@ public protocol IndexPathNode {
 }
 
 /// Node protocol
-public protocol VerticalTreeNode: class, IndexPathNode where Self.T == Self {
+public protocol VerticalTreeNode: IndexPathNode where Self.T == Self {
     /// indexViewLegnth
     var length: TreeNodeLength { get }
     /// info description

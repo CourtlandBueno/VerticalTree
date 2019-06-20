@@ -12,6 +12,7 @@ import PackageDescription
 
 let package = Package(
     name: "VerticalTree",
+    platforms: [.iOS("10.0")],
     products: [
         .library(
             name: "VerticalTree", 

@@ -76,7 +76,7 @@ open class VerticalTreeListController<T: VerticalTreeNode>: UITableViewControlle
     
     override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let node = rootNodeDataList[indexPath.section][indexPath.row]
+        var node = rootNodeDataList[indexPath.section][indexPath.row]
 
         if let handle = didSelectedHandle {
             handle(node)
@@ -84,7 +84,7 @@ open class VerticalTreeListController<T: VerticalTreeNode>: UITableViewControlle
         }
         
         guard let cell = tableView.cellForRow(at: indexPath) as? VerticalTreeCell<T> else { return }
-        node.isFold = !node.isFold
+        node.isFold.toggle()
         rootNodeDataList[indexPath.section][indexPath.row] = node
         
         tableView.beginUpdates()

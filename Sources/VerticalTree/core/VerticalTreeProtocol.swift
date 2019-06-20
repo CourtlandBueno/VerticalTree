@@ -7,7 +7,9 @@
 //
 
 import Foundation
-
+#if canImport(CoreGraphics)
+import CoreGraphics
+#endif
 /// index width
 ///
 /// - eachWidth: eachWidth of the next node
